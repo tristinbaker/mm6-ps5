@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 18:37:15 -0400
+Subject: [PATCH] Don't throw or log too early while detecting the game at
+ startup
+
+On a PS5 native title, checking for '.portable' threw: stat on a relative path fails with EINVAL, and
+std::filesystem::exists throws on anything but not-found. The other existence checks made while detecting the
+game and resolving the data path go through a non-throwing pathExists too. And game version detection resolves
+paths while the options are parsed, before there's a logger, so the path override message is only logged when
+there is one (it crashed under the PS5 filesystem rules on the desktop).
+---
+ src/Application/Paths/PathResolver.cpp   | 12 +++++++++---
+ src/Application/Paths/PathResolver.h     |  7 +++++++
+ src/Application/Startup/GameStarter.cpp  |  2 +-
+ src/Bin/OpenEnroth/OpenEnrothOptions.cpp |  2 +-
+ 4 files changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/src/Application/Paths/PathResolver.cpp b/src/Application/Paths/PathResolver.cpp
+index 6e58972..65f70c5 100644
+--- a/src/Application/Paths/PathResolver.cpp
++++ b/src/Application/Paths/PathResolver.cpp
+@@ -80,7 +80,8 @@ static std::vector<std::string> resolvePaths(Environment *environment, const Pat
+     // If we have a path override then it'll be the only path we'll check.
+     std::string envPath = environment->getenv(config.overrideEnvKey);
+     if (!envPath.empty()) {
+-        logger->info("Path override provided, '{}={}'.", config.overrideEnvKey, envPath);
++        if (logger) // Game version detection resolves paths while parsing options, before there's a logger.
++            logger->info("Path override provided, '{}={}'.", config.overrideEnvKey, envPath);
+         return {envPath};
+     }
+ 
+@@ -184,8 +185,13 @@ std::string currentWorkingDirectory() {
+     return error ? std::string() : result.generic_string();
+ }
+ 
++bool pathExists(std::string_view path) {
++    std::error_code error;
++    return !path.empty() && std::filesystem::exists(path, error);
++}
++
+ std::optional<GameVersion> detectGameVersion(std::string_view dataPath) {
+-    if (!std::filesystem::exists(dataPath))
++    if (!pathExists(dataPath))
+         return std::nullopt;
+ 
+     std::string missingFile;
+@@ -200,7 +206,7 @@ std::optional<GameVersion> detectGameVersion(Environment *environment) {
+     for (GameVersion version : {GAME_VERSION_MM7, GAME_VERSION_MM6}) {
+         for (const std::string &candidate : resolveGamePaths(environment, version)) {
+             std::string missingFile;
+-            if (std::filesystem::exists(candidate) && validateGamePath(candidate, version, &missingFile))
++            if (pathExists(candidate) && validateGamePath(candidate, version, &missingFile))
+                 return version;
+         }
+     }
+diff --git a/src/Application/Paths/PathResolver.h b/src/Application/Paths/PathResolver.h
+index e0d4948..16c60e3 100644
+--- a/src/Application/Paths/PathResolver.h
++++ b/src/Application/Paths/PathResolver.h
+@@ -47,6 +47,13 @@ bool validateGamePath(std::string_view dataPath, GameVersion version, std::strin
+  */
+ std::string currentWorkingDirectory();
+ 
++/**
++ * @return                              Whether `path` exists. Unlike `std::filesystem::exists`, an error checking it
++ *                                      means it doesn't, instead of throwing - a PS5 native title can't even stat a
++ *                                      relative path.
++ */
++bool pathExists(std::string_view path);
++
+ std::optional<GameVersion> detectGameVersion(std::string_view dataPath);
+ 
+ /**
+diff --git a/src/Application/Startup/GameStarter.cpp b/src/Application/Startup/GameStarter.cpp
+index f49bcc9..1b172bb 100644
+--- a/src/Application/Startup/GameStarter.cpp
++++ b/src/Application/Startup/GameStarter.cpp
+@@ -234,7 +234,7 @@ void GameStarter::resolveDataPath(Environment *environment, GameStarterOptions *
+ 
+     for (int i = 0; i < candidates.size(); i++) {
+         std::string missingFile;
+-        if (!std::filesystem::exists(candidates[i])) {
++        if (!pathExists(candidates[i])) {
+             logger->info("Data path #{} ('{}') doesn't exist.", i + 1, candidates[i]);
+         } else if (!validateGamePath(candidates[i], options->gameVersion, &missingFile)) {
+             logger->info("Data path #{} ('{}') is missing file '{}'.", i + 1, candidates[i], missingFile);
+diff --git a/src/Bin/OpenEnroth/OpenEnrothOptions.cpp b/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
+index afd40dd..2f6a610 100644
+--- a/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
++++ b/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
+@@ -96,7 +96,7 @@ OpenEnrothOptions OpenEnrothOptions::parse(int argc, char **argv) {
+ 
+     app->parse(argc, argv, result.helpPrinted);
+ 
+-    if (!portable && std::filesystem::exists(".portable"))
++    if (!portable && pathExists(".portable"))
+         portable = true;
+     if (portable && *portable) {
+         if (result.userPath.empty())

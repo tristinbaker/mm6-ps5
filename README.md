@@ -65,6 +65,14 @@ A crash shows up there as "A user thread receives a fatal signal" with a backtra
 `0x400000`; subtract that and look the addresses up with
 `$LLVM21/bin/llvm-symbolizer --obj=build/title/build/llvm-pie.elf <address>`.
 
+A native title can't query its working directory, and relative paths fail with EINVAL. `tools/ps5-fs-sim` makes a
+desktop build see files the same way, which catches startup failures without a round trip to the console:
+
+```sh
+cc -shared -fPIC -O2 -o ps5-fs-sim.so tools/ps5-fs-sim/ps5-fs-sim.c -ldl
+OPENENROTH_MM6_PATH=<MM6 folder> LD_PRELOAD=$PWD/ps5-fs-sim.so <desktop build>/OpenEnroth --headless
+```
+
 ## How it works
 
 - **OpenEnroth's MM6 branch** is patched (`patches/openenroth`): fixes for newer compilers and FFmpeg 7, an
@@ -91,6 +99,7 @@ A crash shows up there as "A user thread receives a fatal signal" with a backtra
 | `toolchain/` | CMake toolchain file and compiler wrappers for the PS5 |
 | `platform/` | runtime glue linked into the title |
 | `patches/` | changes to OpenEnroth, ps5-opengl and SDL2 |
+| `tools/ps5-fs-sim/` | the PS5's file system rules for desktop builds |
 | `title/` | home-screen art, turned into the icon and backgrounds by `scripts/make-title-art.py` |
 | `docs/` | install guide |
 | `deps/`, `build/`, `logs/` | created by the scripts, not committed |
