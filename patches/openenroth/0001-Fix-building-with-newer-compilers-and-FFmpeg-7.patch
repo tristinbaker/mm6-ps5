@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 17:07:31 -0400
+Subject: [PATCH] Fix building with newer compilers and FFmpeg 7
+
+- Include <cstdint> where uint32_t and friends are used (CommonSerialization.h, FFmpegBlobIoContext.h); newer
+  standard libraries no longer bring it in transitively.
+- Don't let clang 21's -Wuninitialized-const-pointer fail imgui's build: this imgui version passes an uninitialized
+  char with a length of 0.
+- Drop MagicGuild.cpp's static skillForMagicSchool, it redeclares the one in CharacterEnumFunctions.h and the calls
+  become ambiguous outside MSVC.
+- Use a fixed 4096 byte avio buffer, AV_INPUT_BUFFER_MIN_SIZE was removed in FFmpeg 7 (as upstream does).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ src/GUI/UI/Houses/MagicGuild.cpp         | 5 -----
+ src/Library/Binary/CommonSerialization.h | 1 +
+ src/Media/FFmpegBlobIoContext.cpp        | 7 +++++--
+ src/Media/FFmpegBlobIoContext.h          | 1 +
+ thirdparty/imgui/CMakeLists.txt          | 5 +++++
+ 5 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/src/GUI/UI/Houses/MagicGuild.cpp b/src/GUI/UI/Houses/MagicGuild.cpp
+index 073c4ed0..fb8a00d9 100644
+--- a/src/GUI/UI/Houses/MagicGuild.cpp
++++ b/src/GUI/UI/Houses/MagicGuild.cpp
+@@ -126,11 +126,6 @@ AwardId mm6MagicGuildMembershipAward(HouseId houseId) {
+     return mm6MagicGuild(houseId)->membershipAward;
+ }
+ 
+-// MM6 skill slots 12-20 are the nine school skills in school order.
+-static Skill skillForMagicSchool(MagicSchool school) {
+-    return static_cast<Skill>(std::to_underlying(SKILL_FIRE) + std::to_underlying(school));
+-}
+-
+ HouseId GUIWindow_MagicGuild::guildStorageId() const {
+     if (engine->gameVersion() == GAME_VERSION_MM6)
+         return static_cast<HouseId>(std::to_underlying(houseId()) + 20);
+diff --git a/src/Library/Binary/CommonSerialization.h b/src/Library/Binary/CommonSerialization.h
+index b2963601..481885e0 100644
+--- a/src/Library/Binary/CommonSerialization.h
++++ b/src/Library/Binary/CommonSerialization.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <cassert>
++#include <cstdint>
+ #include <span>
+ #include <array>
+ #include <typeinfo>
+diff --git a/src/Media/FFmpegBlobIoContext.cpp b/src/Media/FFmpegBlobIoContext.cpp
+index 36b37828..d2b6fbd4 100644
+--- a/src/Media/FFmpegBlobIoContext.cpp
++++ b/src/Media/FFmpegBlobIoContext.cpp
+@@ -64,8 +64,11 @@ void FFmpegBlobIoContext::reset(Blob blob) {
+ }
+ 
+ void FFmpegBlobIoContext::createAvioContext() {
+-    unsigned char *buffer = static_cast<unsigned char *>(av_malloc(AV_INPUT_BUFFER_MIN_SIZE));
+-    _ctx = avio_alloc_context(buffer, AV_INPUT_BUFFER_MIN_SIZE, 0, this, &ffRead, nullptr, &ffSeek);
++    // AV_INPUT_BUFFER_MIN_SIZE is gone in FFmpeg 7. avio_alloc_context docs suggest a cache-page-sized buffer, and
++    // the size doesn't really matter as we're reading from an in-memory blob.
++    constexpr int bufferSize = 4096;
++    unsigned char *buffer = static_cast<unsigned char *>(av_malloc(bufferSize));
++    _ctx = avio_alloc_context(buffer, bufferSize, 0, this, &ffRead, nullptr, &ffSeek);
+ }
+ 
+ void FFmpegBlobIoContext::destroyAvioContext() {
+diff --git a/src/Media/FFmpegBlobIoContext.h b/src/Media/FFmpegBlobIoContext.h
+index 28d12876..8ac84cae 100644
+--- a/src/Media/FFmpegBlobIoContext.h
++++ b/src/Media/FFmpegBlobIoContext.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include <cstdint>
+ #include "Utility/Memory/Blob.h"
+ #include "Utility/Streams/BlobInputStream.h"
+ 
+diff --git a/thirdparty/imgui/CMakeLists.txt b/thirdparty/imgui/CMakeLists.txt
+index 945cc45b..7fbb21a8 100644
+--- a/thirdparty/imgui/CMakeLists.txt
++++ b/thirdparty/imgui/CMakeLists.txt
+@@ -44,5 +44,10 @@ set(IMGUI_HEADERS
+     imgui/imstb_truetype.h)
+ 
+ add_library(imgui STATIC ${IMGUI_SOURCES} ${IMGUI_HEADERS})
++if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 21)
++    # This imgui version passes an uninitialized char to stb_textedit_replace with a length of 0, which
++    # -Werror=uninitialized turns into an error since clang 21.
++    target_compile_options(imgui PRIVATE -Wno-error=uninitialized-const-pointer)
++endif()
+ target_link_libraries(imgui PUBLIC imgui_backends)
+ target_include_directories(imgui PUBLIC ${IMGUI_BACKENDS_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})

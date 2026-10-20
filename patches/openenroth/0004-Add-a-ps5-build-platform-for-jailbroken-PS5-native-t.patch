@@ -1,0 +1,181 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 12:56:51 -0400
+Subject: [PATCH] Add a ps5 build platform for jailbroken PS5 native titles
+
+Detected when the PS5 toolchain file sets PS5. Like Android it builds without backward-cpp (now keyed off
+OE_NO_BACKWARD), takes OpenGL from the static ps5-opengl SDK and static dependencies from the toolchain,
+links a LuaJIT supplied by the toolchain, and gives ImGui's OpenGL backend the functions glad resolved,
+since a native title can't dlopen libGL.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ CMakeModules/Dependencies.cmake              | 11 +++++++++++
+ CMakeModules/Detection.cmake                 |  5 ++++-
+ src/Library/StackTrace/CMakeLists.txt        |  6 ++++--
+ src/Library/StackTrace/StackTrace.cpp        |  6 +++---
+ src/Library/StackTrace/StackTraceOnCrash.cpp |  4 ++--
+ thirdparty/CMakeLists.txt                    | 20 +++++++++++++++-----
+ thirdparty/imgui/CMakeLists.txt              |  8 ++++++++
+ 7 files changed, 47 insertions(+), 13 deletions(-)
+
+diff --git a/CMakeModules/Dependencies.cmake b/CMakeModules/Dependencies.cmake
+index 1b63cde8..7f96c744 100644
+--- a/CMakeModules/Dependencies.cmake
++++ b/CMakeModules/Dependencies.cmake
+@@ -113,6 +113,11 @@ macro(resolve_dependencies) # Intentionally a macro - we want set() to work in p
+         add_library(FFmpeg_swresample INTERFACE)
+         add_library(FFmpeg::swresample ALIAS FFmpeg_swresample)
+     else()
++        # The PS5 toolchain's dependencies are all static libraries.
++        if(OE_BUILD_PLATFORM STREQUAL "ps5")
++            set(ZLIB_USE_STATIC_LIBS ON)
++        endif()
++
+         # Prebuilt & user-supplied deps are resolved using the same code here.
+         find_package(ZLIB REQUIRED)
+         find_package(FFmpeg REQUIRED)
+@@ -158,6 +163,12 @@ macro(resolve_dependencies) # Intentionally a macro - we want set() to work in p
+     if(OE_USE_DUMMY_DEPENDENCIES OR OE_BUILD_PLATFORM STREQUAL "android")
+         add_library(OpenGL_GL INTERFACE)
+         add_library(OpenGL::GL ALIAS OpenGL_GL)
++    elseif(OE_BUILD_PLATFORM STREQUAL "ps5")
++        # On PS5, OpenGL is the statically linked ps5-opengl SDK, and SDL2's video driver calls into its EGL.
++        find_package(PS5OpenGL CONFIG REQUIRED)
++        add_library(OpenGL_GL INTERFACE)
++        target_link_libraries(OpenGL_GL INTERFACE PS5OpenGL::OpenGL)
++        add_library(OpenGL::GL ALIAS OpenGL_GL)
+     else()
+         find_package(OpenGL REQUIRED)
+     endif()
+diff --git a/CMakeModules/Detection.cmake b/CMakeModules/Detection.cmake
+index c0165439..3e01e4c6 100644
+--- a/CMakeModules/Detection.cmake
++++ b/CMakeModules/Detection.cmake
+@@ -1,7 +1,10 @@
+ set(OE_BUILD_PLATFORM "unknown")
+ set(OE_BUILD_ARCHITECTURE "unknown")
+ 
+-if(WIN32)
++if(PS5)
++    # Jailbroken PS5 native title, set by the PS5 toolchain file (CMAKE_SYSTEM_NAME is Generic there).
++    set(OE_BUILD_PLATFORM "ps5")
++elseif(WIN32)
+     set(OE_BUILD_PLATFORM "windows")
+ elseif(MINGW)
+     set(OE_BUILD_PLATFORM "mingw")
+diff --git a/src/Library/StackTrace/CMakeLists.txt b/src/Library/StackTrace/CMakeLists.txt
+index 566a8233..dc403443 100644
+--- a/src/Library/StackTrace/CMakeLists.txt
++++ b/src/Library/StackTrace/CMakeLists.txt
+@@ -12,7 +12,9 @@ add_library(library_stack_trace STATIC ${LIBRARY_STACK_TRACE_SOURCES} ${LIBRARY_
+ target_link_libraries(library_stack_trace PUBLIC utility)
+ target_check_style(library_stack_trace)
+ 
+-# backward-cpp doesn't support Android...
+-if (NOT OE_BUILD_PLATFORM STREQUAL "android")
++# backward-cpp doesn't support Android, and isn't built for the PS5...
++if (OE_BUILD_PLATFORM STREQUAL "android" OR OE_BUILD_PLATFORM STREQUAL "ps5")
++    target_compile_definitions(library_stack_trace PRIVATE OE_NO_BACKWARD)
++else ()
+     target_link_libraries(library_stack_trace PRIVATE Backward::Backward)
+ endif ()
+diff --git a/src/Library/StackTrace/StackTrace.cpp b/src/Library/StackTrace/StackTrace.cpp
+index cf4cded4..31835786 100644
+--- a/src/Library/StackTrace/StackTrace.cpp
++++ b/src/Library/StackTrace/StackTrace.cpp
+@@ -2,16 +2,16 @@
+ 
+ #include <cstdio>
+ 
+-#ifndef __ANDROID__
++#ifndef OE_NO_BACKWARD
+ #   include <backward.hpp>
+ #endif
+ 
+ #include "Utility/String/Format.h"
+ 
+-#ifdef __ANDROID__
++#ifdef OE_NO_BACKWARD
+ 
+ void printStackTrace(FILE *stream) {
+-    fmt::println(stream, "Stack traces not supported on Android...");
++    fmt::println(stream, "Stack traces not supported on this platform...");
+ }
+ 
+ #else
+diff --git a/src/Library/StackTrace/StackTraceOnCrash.cpp b/src/Library/StackTrace/StackTraceOnCrash.cpp
+index 95865ded..8de78651 100644
+--- a/src/Library/StackTrace/StackTraceOnCrash.cpp
++++ b/src/Library/StackTrace/StackTraceOnCrash.cpp
+@@ -2,11 +2,11 @@
+ 
+ #include <memory>
+ 
+-#ifndef __ANDROID__
++#ifndef OE_NO_BACKWARD
+ #   include <backward.hpp>
+ #endif
+ 
+-#ifdef __ANDROID__
++#ifdef OE_NO_BACKWARD
+ 
+ StackTraceOnCrash::StackTraceOnCrash() = default;
+ 
+diff --git a/thirdparty/CMakeLists.txt b/thirdparty/CMakeLists.txt
+index b3e5630d..20639c8f 100644
+--- a/thirdparty/CMakeLists.txt
++++ b/thirdparty/CMakeLists.txt
+@@ -29,10 +29,20 @@ add_subdirectory(glad EXCLUDE_FROM_ALL)
+ target_include_directories(glad INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/glad/include)
+ 
+ # luajit
+-set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/luajit)
+-include(${CMAKE_CURRENT_LIST_DIR}/luajit-cmake/LuaJIT.cmake)
+-target_include_directories(libluajit INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+-set_target_properties(libluajit PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS}" LINK_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}") # Make it compile under x86.
++if(OE_BUILD_PLATFORM STREQUAL "ps5")
++    # luajit-cmake can't cross-compile its host tools for a Generic target, so the PS5 toolchain supplies a
++    # LuaJIT built from this submodule (LUAJIT_INCLUDE_DIR / LUAJIT_LIBRARY). It must be built with
++    # LUAJIT_ENABLE_LUA52COMPAT like the bundled one, since the scripts rely on __pairs.
++    find_path(LUAJIT_INCLUDE_DIR luajit.h PATH_SUFFIXES luajit-2.1 REQUIRED)
++    find_library(LUAJIT_LIBRARY NAMES luajit-5.1 REQUIRED)
++    add_library(libluajit STATIC IMPORTED GLOBAL)
++    set_target_properties(libluajit PROPERTIES IMPORTED_LOCATION "${LUAJIT_LIBRARY}" INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_INCLUDE_DIR}")
++else()
++    set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/luajit)
++    include(${CMAKE_CURRENT_LIST_DIR}/luajit-cmake/LuaJIT.cmake)
++    target_include_directories(libluajit INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
++    set_target_properties(libluajit PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS}" LINK_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}") # Make it compile under x86.
++endif()
+ 
+ # inifile_cpp, would rather not use add_subdirectory
+ add_library(inicpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/inifile_cpp/include/inicpp.h)
+@@ -63,7 +73,7 @@ if(OE_BUILD_TESTS)
+ endif()
+ 
+ # backward
+-if(NOT OE_BUILD_PLATFORM STREQUAL "android")
++if(NOT OE_BUILD_PLATFORM STREQUAL "android" AND NOT OE_BUILD_PLATFORM STREQUAL "ps5")
+     add_subdirectory(backward_cpp EXCLUDE_FROM_ALL)
+     if (OE_BUILD_PLATFORM STREQUAL "linux" AND NOT OE_USE_DUMMY_DEPENDENCIES)
+         string(FIND "${BACKWARD_DEFINITIONS}" "BACKWARD_HAS_DWARF=1" DWARF_POS)
+diff --git a/thirdparty/imgui/CMakeLists.txt b/thirdparty/imgui/CMakeLists.txt
+index 9e4fd2dd..789ddf35 100644
+--- a/thirdparty/imgui/CMakeLists.txt
++++ b/thirdparty/imgui/CMakeLists.txt
+@@ -37,6 +37,14 @@ add_library(imgui_backends STATIC ${IMGUI_BACKENDS_SOURCES} ${IMGUI_BACKENDS_HEA
+ target_link_libraries(imgui_backends PRIVATE ${IMGUI_SDL_TARGET} glad)
+ target_include_directories(imgui_backends PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends)
+ 
++# ImGui's built-in OpenGL loader dlopens libGL, which a PS5 native title can't do. There, use the functions that
++# OpenEnroth's glad loader has already resolved by the time the overlay is initialized.
++if(OE_BUILD_PLATFORM STREQUAL "ps5")
++    set_source_files_properties(${IMGUI_BACKENDS_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp PROPERTIES
++        COMPILE_DEFINITIONS IMGUI_IMPL_OPENGL_LOADER_CUSTOM
++        COMPILE_OPTIONS "-include;glad/gl.h")
++endif()
++
+ set(IMGUI_SOURCES
+     imgui/imgui_draw.cpp
+     imgui/imgui.cpp

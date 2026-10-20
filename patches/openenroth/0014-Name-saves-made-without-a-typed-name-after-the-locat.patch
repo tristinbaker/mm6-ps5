@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 17:16:51 -0400
+Subject: [PATCH] Name saves made without a typed name after the location
+
+Saving into an empty slot without typing a name, which is all a gamepad can do, saved it as "Empty". Use the
+current location's name instead, like the MM7 port's save menu does.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_015VfmWXQvA5SFBqR9wsdzx9
+---
+ src/Application/GameMenu.cpp | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/Application/GameMenu.cpp b/src/Application/GameMenu.cpp
+index e791e303..14cf4dd8 100644
+--- a/src/Application/GameMenu.cpp
++++ b/src/Application/GameMenu.cpp
+@@ -9,6 +9,7 @@
+ 
+ #include "Engine/AssetsManager.h"
+ #include "Engine/Engine.h"
++#include "Engine/MapInfo.h"
+ #include "Engine/EngineGlobals.h"
+ #include "Engine/Graphics/Renderer/Renderer.h"
+ #include "Engine/Graphics/Image.h"
+@@ -160,14 +161,20 @@ void Menu::EventLoop() {
+                     uGameState = GAME_STATE_LOADING_GAME;
+                 }
+                 continue;
+-            case UIMSG_SaveGame:
++            case UIMSG_SaveGame: {
+                 pAudioPlayer->playUISound(SOUND_StartMainChoice02);
++                std::string &name = pSavegameList->pSavegameHeader[pSavegameList->selectedSlot].name;
+                 if (pGUIWindow_CurrentMenu->keyboard_input_status == WINDOW_INPUT_IN_PROGRESS) {
+-                    pSavegameList->pSavegameHeader[pSavegameList->selectedSlot].name = keyboardInputHandler->GetTextInput();
++                    name = keyboardInputHandler->GetTextInput();
+                     keyboardInputHandler->EndTextInput();
+                 }
++                // Saving into an empty slot without typing a name, which is all a gamepad can do: name the save after
++                // the location instead of "Empty".
++                if ((name.empty() || name == localization->str(LSTR_EMPTY_SAVE)) && engine->_currentLoadedMapId != MAP_INVALID)
++                    name = std::string(pMapStats->pInfos[engine->_currentLoadedMapId].name).substr(0, 19);
+                 doSavegame(pSavegameList->selectedSlot);
+                 continue;
++            }
+             case UIMSG_Game_OpenSaveGameDialog: {
+                 if (engine->_currentLoadedMapId == MAP_ARENA) {
+                     engine->_statusBar->setEvent(LSTR_NO_SAVING_IN_THE_ARENA);
