@@ -10,8 +10,6 @@ Subject: [PATCH] Fix building with newer compilers and FFmpeg 7
 - Drop MagicGuild.cpp's static skillForMagicSchool, it redeclares the one in CharacterEnumFunctions.h and the calls
   become ambiguous outside MSVC.
 - Use a fixed 4096 byte avio buffer, AV_INPUT_BUFFER_MIN_SIZE was removed in FFmpeg 7 (as upstream does).
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
  src/GUI/UI/Houses/MagicGuild.cpp         | 5 -----
  src/Library/Binary/CommonSerialization.h | 1 +

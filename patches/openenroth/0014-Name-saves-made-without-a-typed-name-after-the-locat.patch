@@ -5,9 +5,6 @@ Subject: [PATCH] Name saves made without a typed name after the location
 
 Saving into an empty slot without typing a name, which is all a gamepad can do, saved it as "Empty". Use the
 current location's name instead, like the MM7 port's save menu does.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_015VfmWXQvA5SFBqR9wsdzx9
 ---
  src/Application/GameMenu.cpp | 11 +++++++++--
  1 file changed, 9 insertions(+), 2 deletions(-)

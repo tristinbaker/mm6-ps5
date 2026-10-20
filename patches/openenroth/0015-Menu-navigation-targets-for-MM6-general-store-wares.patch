@@ -5,9 +5,6 @@ Subject: [PATCH] Menu navigation targets for MM6 general store wares
 
 MM6's general stores draw their six items on their own table layout (mm6GeneralStoreItemPos), which the shop
 targets from the menu navigation patch didn't cover.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_015VfmWXQvA5SFBqR9wsdzx9
 ---
  src/GUI/UI/Houses/Shops.cpp | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)

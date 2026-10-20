@@ -7,7 +7,7 @@ console's GPU, DualSense input and console audio. No emulation or Wine.
 
 Upstream OpenEnroth plays only MM7 so far. MM6 comes from xygtshadow's
 [`mm6-support` branch](https://github.com/xygtshadow/OpenEnroth/tree/mm6-support), which this port builds on. The
-Might and Magic VII port lives in its own repository (`mm-ps5`) and shares the PS5 work: the platform layer, the
+Might and Magic VII port lives in its own repository (`mm7-ps5`) and shares the PS5 work: the platform layer, the
 controller support and the build.
 
 > **Status: early.** The MM6 branch passes its 156 scripted MM6 game tests on the Steam release's data, with the

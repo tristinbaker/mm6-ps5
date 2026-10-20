@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 17:36:11 -0400
+Subject: [PATCH] Don't fail game detection when the working directory can't be
+ queried
+
+std::filesystem::current_path() throws when getcwd fails, which it always does in a PS5 native title. Game
+version detection asked for it whenever neither --data-path nor --game-version was given, so an MM6 title found
+through OPENENROTH_MM6_PATH crashed at startup. The working directory is now just skipped as a candidate when it
+can't be queried (currentWorkingDirectory).
+---
+ src/Application/Paths/PathResolver.cpp   | 9 ++++++++-
+ src/Application/Paths/PathResolver.h     | 6 ++++++
+ src/Bin/OpenEnroth/OpenEnrothOptions.cpp | 2 +-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/Application/Paths/PathResolver.cpp b/src/Application/Paths/PathResolver.cpp
+index 4625094..6e58972 100644
+--- a/src/Application/Paths/PathResolver.cpp
++++ b/src/Application/Paths/PathResolver.cpp
+@@ -87,7 +87,8 @@ static std::vector<std::string> resolvePaths(Environment *environment, const Pat
+     std::vector<std::string> result;
+ 
+     // Otherwise we check PWD first.
+-    result.push_back(std::filesystem::current_path().generic_string());
++    if (std::string pwd = currentWorkingDirectory(); !pwd.empty())
++        result.push_back(pwd);
+ 
+     // Then we check paths from registry on Windows,...
+     for (const char *registryKey : config.registryKeys) {
+@@ -177,6 +178,12 @@ bool validateGamePath(std::string_view dataPath, GameVersion version, std::strin
+     return false;
+ }
+ 
++std::string currentWorkingDirectory() {
++    std::error_code error;
++    std::filesystem::path result = std::filesystem::current_path(error);
++    return error ? std::string() : result.generic_string();
++}
++
+ std::optional<GameVersion> detectGameVersion(std::string_view dataPath) {
+     if (!std::filesystem::exists(dataPath))
+         return std::nullopt;
+diff --git a/src/Application/Paths/PathResolver.h b/src/Application/Paths/PathResolver.h
+index 3c0421b..e0d4948 100644
+--- a/src/Application/Paths/PathResolver.h
++++ b/src/Application/Paths/PathResolver.h
+@@ -41,6 +41,12 @@ bool validateGamePath(std::string_view dataPath, GameVersion version, std::strin
+  * @return                          The game version whose data set is present at `dataPath`, preferring MM7 in the
+  *                                  unlikely case both are, or `std::nullopt` if there's no complete data set.
+  */
++/**
++ * @return                              The current working directory, or an empty string if it can't be queried - a
++ *                                      PS5 native title can't, and `std::filesystem::current_path()` throws there.
++ */
++std::string currentWorkingDirectory();
++
+ std::optional<GameVersion> detectGameVersion(std::string_view dataPath);
+ 
+ /**
+diff --git a/src/Bin/OpenEnroth/OpenEnrothOptions.cpp b/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
+index fab05da..afd40dd 100644
+--- a/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
++++ b/src/Bin/OpenEnroth/OpenEnrothOptions.cpp
+@@ -110,7 +110,7 @@ OpenEnrothOptions OpenEnrothOptions::parse(int argc, char **argv) {
+     } else {
+         // No explicit --game-version, so detect the game from the data folder. This is what makes
+         // "drop OpenEnroth.exe into the game folder and run it" work for both games.
+-        std::string probePath = !result.dataPath.empty() ? result.dataPath : std::filesystem::current_path().generic_string();
++        std::string probePath = !result.dataPath.empty() ? result.dataPath : currentWorkingDirectory();
+         std::optional<GameVersion> detectedGameVersion = detectGameVersion(probePath);
+ 
+         // Nothing here, and the user didn't pin the data folder either - walk the candidate data paths
