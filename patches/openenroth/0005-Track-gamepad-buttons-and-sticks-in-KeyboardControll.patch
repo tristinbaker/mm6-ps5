@@ -16,7 +16,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  2 files changed, 68 insertions(+), 7 deletions(-)
 
 diff --git a/src/Io/KeyboardController.cpp b/src/Io/KeyboardController.cpp
-index 1eab0498..aa97c812 100644
+index 1eab049..aa97c81 100644
 --- a/src/Io/KeyboardController.cpp
 +++ b/src/Io/KeyboardController.cpp
 @@ -2,7 +2,25 @@
@@ -109,7 +109,7 @@ index 1eab0498..aa97c812 100644
      _isKeyPressedThisFrame.fill(false);
      ProxyEventLoop::processMessages(eventHandler);
 diff --git a/src/Io/KeyboardController.h b/src/Io/KeyboardController.h
-index 58e51717..5455c3c5 100644
+index 58e5171..5455c3c 100644
 --- a/src/Io/KeyboardController.h
 +++ b/src/Io/KeyboardController.h
 @@ -28,8 +28,15 @@ class KeyboardController: public PlatformEventFilter, public ProxyEventLoop {

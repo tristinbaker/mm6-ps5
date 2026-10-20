@@ -28,7 +28,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  11 files changed, 148 insertions(+), 30 deletions(-)
 
 diff --git a/src/Application/GameWindowHandler.cpp b/src/Application/GameWindowHandler.cpp
-index 11505791..e739a29d 100644
+index 1150579..e739a29 100644
 --- a/src/Application/GameWindowHandler.cpp
 +++ b/src/Application/GameWindowHandler.cpp
 @@ -594,31 +594,24 @@ bool GameWindowHandler::gamepadKeyReleaseEvent(const PlatformGamepadKeyEvent *ev
@@ -87,7 +87,7 @@ index 11505791..e739a29d 100644
          return false;
  
 diff --git a/src/GUI/GUIWindow.cpp b/src/GUI/GUIWindow.cpp
-index 6a0afde4..0423dd21 100644
+index 6a0afde..0423dd2 100644
 --- a/src/GUI/GUIWindow.cpp
 +++ b/src/GUI/GUIWindow.cpp
 @@ -45,6 +45,7 @@
@@ -109,7 +109,7 @@ index 6a0afde4..0423dd21 100644
          extern bool UI_OnKeyDown(PlatformKey key);
          UI_OnKeyDown(PlatformKey::KEY_PAGEDOWN); // hack to highlight dialog options under mouse cursor
 diff --git a/src/GUI/UI/Houses/MagicGuild.cpp b/src/GUI/UI/Houses/MagicGuild.cpp
-index fb8a00d9..a0eea6d3 100644
+index fb8a00d..a0eea6d 100644
 --- a/src/GUI/UI/Houses/MagicGuild.cpp
 +++ b/src/GUI/UI/Houses/MagicGuild.cpp
 @@ -308,9 +308,11 @@ void GUIWindow_MagicGuild::buyBooksDialogue() {
@@ -125,7 +125,7 @@ index fb8a00d9..a0eea6d3 100644
  
          ++itemxind;
 diff --git a/src/GUI/UI/Houses/Shops.cpp b/src/GUI/UI/Houses/Shops.cpp
-index 167c0cc0..6bc73fec 100644
+index 167c0cc..6bc73fe 100644
 --- a/src/GUI/UI/Houses/Shops.cpp
 +++ b/src/GUI/UI/Houses/Shops.cpp
 @@ -321,9 +321,15 @@ void GUIWindow_Shop::mainDialogue() {
@@ -198,7 +198,7 @@ index 167c0cc0..6bc73fec 100644
      }
  
 diff --git a/src/GUI/UI/Houses/Shops.h b/src/GUI/UI/Houses/Shops.h
-index 387f3e24..e7876409 100644
+index 387f3e2..e787640 100644
 --- a/src/GUI/UI/Houses/Shops.h
 +++ b/src/GUI/UI/Houses/Shops.h
 @@ -25,6 +25,7 @@ class GUIWindow_Shop : public GUIWindow_House {
@@ -210,7 +210,7 @@ index 387f3e24..e7876409 100644
      void displayEquipmentDialogue();
      void sellDialogue();
 diff --git a/src/GUI/UI/ItemGrid.cpp b/src/GUI/UI/ItemGrid.cpp
-index 1dbbdc5a..c7742563 100644
+index 1dbbdc5..c774256 100644
 --- a/src/GUI/UI/ItemGrid.cpp
 +++ b/src/GUI/UI/ItemGrid.cpp
 @@ -42,3 +42,11 @@ Pointi mapToInventoryGrid(Pointi mousePos, Pointi inventoryTopLeft, Item* heldIt
@@ -226,7 +226,7 @@ index 1dbbdc5a..c7742563 100644
 +    return result;
 +}
 diff --git a/src/GUI/UI/ItemGrid.h b/src/GUI/UI/ItemGrid.h
-index 783b3817..afef63ea 100644
+index 783b381..afef63e 100644
 --- a/src/GUI/UI/ItemGrid.h
 +++ b/src/GUI/UI/ItemGrid.h
 @@ -1,6 +1,9 @@
@@ -251,7 +251,7 @@ index 783b3817..afef63ea 100644
 + */
 +std::vector<Pointi> inventoryCellCenters(Pointi inventoryTopLeft, Sizei gridSize);
 diff --git a/src/GUI/UI/UIHouses.cpp b/src/GUI/UI/UIHouses.cpp
-index 0c391d5e..f882a732 100644
+index 0c391d5..f882a73 100644
 --- a/src/GUI/UI/UIHouses.cpp
 +++ b/src/GUI/UI/UIHouses.cpp
 @@ -1459,6 +1459,7 @@ void GUIWindow_House::Update() {
@@ -263,7 +263,7 @@ index 0c391d5e..f882a732 100644
      if (engine->gameVersion() == GAME_VERSION_MM6) {
          // MM6.EXE finishes EVERY house screen with the two viewport corner patches (0x417dc0,
 diff --git a/src/GUI/UI/UIHouses.h b/src/GUI/UI/UIHouses.h
-index 467dc3de..43c5e573 100644
+index 467dc3d..43c5e57 100644
 --- a/src/GUI/UI/UIHouses.h
 +++ b/src/GUI/UI/UIHouses.h
 @@ -132,6 +132,15 @@ class GUIWindow_House : public GUIWindow {
@@ -297,7 +297,7 @@ index 467dc3de..43c5e573 100644
      bool _transactionPerformed = false;
  };
 diff --git a/src/Io/MenuNavigation.cpp b/src/Io/MenuNavigation.cpp
-index 91bfb289..6381d673 100644
+index 91bfb28..6381d67 100644
 --- a/src/Io/MenuNavigation.cpp
 +++ b/src/Io/MenuNavigation.cpp
 @@ -3,6 +3,7 @@
@@ -418,7 +418,7 @@ index 91bfb289..6381d673 100644
      for (GUIWindow *window : menuWindows())
          for (GUIButton *button : window->vButtons)
 diff --git a/src/Io/MenuNavigation.h b/src/Io/MenuNavigation.h
-index 36f3d58c..dad9b23c 100644
+index 36f3d58..dad9b23 100644
 --- a/src/Io/MenuNavigation.h
 +++ b/src/Io/MenuNavigation.h
 @@ -1,5 +1,6 @@

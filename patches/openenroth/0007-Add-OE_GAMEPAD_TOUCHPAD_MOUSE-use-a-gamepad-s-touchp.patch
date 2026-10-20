@@ -26,7 +26,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  8 files changed, 225 insertions(+), 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 797d9393..cd1fdc09 100644
+index 797d939..cd1fdc0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -40,6 +40,7 @@ set(OE_DISTRIBUTION_BUILD OFF CACHE BOOL "Specify that this is a build for distr
@@ -49,7 +49,7 @@ index 797d9393..cd1fdc09 100644
      add_compile_definitions(OE_USE_SDL2) # Selects ImGui SDL2 backend in the code that calls into it directly.
  endif()
 diff --git a/src/Application/GameWindowHandler.cpp b/src/Application/GameWindowHandler.cpp
-index 32009211..0d5a2175 100644
+index 3200921..0d5a217 100644
 --- a/src/Application/GameWindowHandler.cpp
 +++ b/src/Application/GameWindowHandler.cpp
 @@ -460,7 +460,18 @@ bool GameWindowHandler::keyReleaseEvent(const PlatformKeyEvent *event) {
@@ -73,7 +73,7 @@ index 32009211..0d5a2175 100644
  }
  
 diff --git a/src/Io/Mouse.cpp b/src/Io/Mouse.cpp
-index b9e17e32..3f8be229 100644
+index b9e17e3..3f8be22 100644
 --- a/src/Io/Mouse.cpp
 +++ b/src/Io/Mouse.cpp
 @@ -42,10 +42,20 @@ Pointi Io::Mouse::setPosition(Pointi position) {
@@ -136,7 +136,7 @@ index b9e17e32..3f8be229 100644
              // draw image - needs centering
              pos.x -= (this->cursor_img->width()) / 2;
 diff --git a/src/Io/Mouse.h b/src/Io/Mouse.h
-index 20cc0263..21a988fa 100644
+index 20cc026..21a988f 100644
 --- a/src/Io/Mouse.h
 +++ b/src/Io/Mouse.h
 @@ -1,6 +1,8 @@
@@ -170,7 +170,7 @@ index 20cc0263..21a988fa 100644
      enum class MouseLookState { Disabled, Enabled, Suspended };
      using enum MouseLookState;
 diff --git a/src/Library/Platform/Sdl2/SdlEventLoop.cpp b/src/Library/Platform/Sdl2/SdlEventLoop.cpp
-index 1b2874f4..580c8193 100644
+index 1b2874f..580c819 100644
 --- a/src/Library/Platform/Sdl2/SdlEventLoop.cpp
 +++ b/src/Library/Platform/Sdl2/SdlEventLoop.cpp
 @@ -4,6 +4,7 @@
@@ -344,7 +344,7 @@ index 1b2874f4..580c8193 100644
 +}
 +#endif
 diff --git a/src/Library/Platform/Sdl2/SdlEventLoop.h b/src/Library/Platform/Sdl2/SdlEventLoop.h
-index 96b7d63b..2020b959 100644
+index 96b7d63..2020b95 100644
 --- a/src/Library/Platform/Sdl2/SdlEventLoop.h
 +++ b/src/Library/Platform/Sdl2/SdlEventLoop.h
 @@ -2,6 +2,10 @@
@@ -385,7 +385,7 @@ index 96b7d63b..2020b959 100644
 +#endif
  };
 diff --git a/src/Library/Platform/Sdl2/SdlPlatformSharedState.h b/src/Library/Platform/Sdl2/SdlPlatformSharedState.h
-index ac218cb1..3d97113c 100644
+index ac218cb..3d97113 100644
 --- a/src/Library/Platform/Sdl2/SdlPlatformSharedState.h
 +++ b/src/Library/Platform/Sdl2/SdlPlatformSharedState.h
 @@ -7,6 +7,7 @@
@@ -418,7 +418,7 @@ index ac218cb1..3d97113c 100644
 +#endif
  };
 diff --git a/src/Library/Platform/Sdl2/SdlWindow.cpp b/src/Library/Platform/Sdl2/SdlWindow.cpp
-index f3319ef5..27b6ff4e 100644
+index f3319ef..27b6ff4 100644
 --- a/src/Library/Platform/Sdl2/SdlWindow.cpp
 +++ b/src/Library/Platform/Sdl2/SdlWindow.cpp
 @@ -185,6 +185,9 @@ void SdlWindow::activate() {

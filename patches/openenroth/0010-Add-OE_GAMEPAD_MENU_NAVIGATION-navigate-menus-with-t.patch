@@ -31,7 +31,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  create mode 100644 src/Io/MenuNavigation.h
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cd1fdc09..2c6d5ca6 100644
+index cd1fdc0..2c6d5ca 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -40,6 +40,7 @@ set(OE_DISTRIBUTION_BUILD OFF CACHE BOOL "Specify that this is a build for distr
@@ -54,7 +54,7 @@ index cd1fdc09..2c6d5ca6 100644
      add_compile_definitions(OE_USE_SDL2) # Selects ImGui SDL2 backend in the code that calls into it directly.
  endif()
 diff --git a/src/Application/GameWindowHandler.cpp b/src/Application/GameWindowHandler.cpp
-index 0d5a2175..11505791 100644
+index 0d5a217..1150579 100644
 --- a/src/Application/GameWindowHandler.cpp
 +++ b/src/Application/GameWindowHandler.cpp
 @@ -1,6 +1,7 @@
@@ -176,7 +176,7 @@ index 0d5a2175..11505791 100644
      PlatformKey key = event->axis;
      float value = event->value;
 diff --git a/src/Application/GameWindowHandler.h b/src/Application/GameWindowHandler.h
-index f1e20f6e..1d5723c2 100644
+index f1e20f6..1d5723c 100644
 --- a/src/Application/GameWindowHandler.h
 +++ b/src/Application/GameWindowHandler.h
 @@ -8,6 +8,7 @@
@@ -211,7 +211,7 @@ index f1e20f6e..1d5723c2 100644
 +#endif
  };
 diff --git a/src/Engine/HitMap.h b/src/Engine/HitMap.h
-index 41be2639..d1796804 100644
+index 41be263..d179680 100644
 --- a/src/Engine/HitMap.h
 +++ b/src/Engine/HitMap.h
 @@ -73,6 +73,43 @@ class HitMap {
@@ -259,7 +259,7 @@ index 41be2639..d1796804 100644
      struct Entry {
          Pointi position;
 diff --git a/src/Io/CMakeLists.txt b/src/Io/CMakeLists.txt
-index 80c126c8..ad7cc9e1 100644
+index 80c126c..ad7cc9e 100644
 --- a/src/Io/CMakeLists.txt
 +++ b/src/Io/CMakeLists.txt
 @@ -5,6 +5,7 @@ set(IO_SOURCES
@@ -280,7 +280,7 @@ index 80c126c8..ad7cc9e1 100644
  add_library(io STATIC ${IO_SOURCES} ${IO_HEADERS})
 diff --git a/src/Io/MenuNavigation.cpp b/src/Io/MenuNavigation.cpp
 new file mode 100644
-index 00000000..91bfb289
+index 0000000..91bfb28
 --- /dev/null
 +++ b/src/Io/MenuNavigation.cpp
 @@ -0,0 +1,128 @@
@@ -414,7 +414,7 @@ index 00000000..91bfb289
 +}
 diff --git a/src/Io/MenuNavigation.h b/src/Io/MenuNavigation.h
 new file mode 100644
-index 00000000..36f3d58c
+index 0000000..36f3d58
 --- /dev/null
 +++ b/src/Io/MenuNavigation.h
 @@ -0,0 +1,35 @@
@@ -454,7 +454,7 @@ index 00000000..36f3d58c
 +
 +} // namespace Io
 diff --git a/src/Io/Mouse.cpp b/src/Io/Mouse.cpp
-index 3f8be229..41f5bfe6 100644
+index 3f8be22..41f5bfe 100644
 --- a/src/Io/Mouse.cpp
 +++ b/src/Io/Mouse.cpp
 @@ -49,7 +49,11 @@ Pointi Io::Mouse::setPosition(Pointi position) {

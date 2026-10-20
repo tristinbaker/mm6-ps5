@@ -21,7 +21,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  5 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/src/GUI/UI/Houses/MagicGuild.cpp b/src/GUI/UI/Houses/MagicGuild.cpp
-index 073c4ed0..fb8a00d9 100644
+index 073c4ed..fb8a00d 100644
 --- a/src/GUI/UI/Houses/MagicGuild.cpp
 +++ b/src/GUI/UI/Houses/MagicGuild.cpp
 @@ -126,11 +126,6 @@ AwardId mm6MagicGuildMembershipAward(HouseId houseId) {
@@ -37,7 +37,7 @@ index 073c4ed0..fb8a00d9 100644
      if (engine->gameVersion() == GAME_VERSION_MM6)
          return static_cast<HouseId>(std::to_underlying(houseId()) + 20);
 diff --git a/src/Library/Binary/CommonSerialization.h b/src/Library/Binary/CommonSerialization.h
-index b2963601..481885e0 100644
+index b296360..481885e 100644
 --- a/src/Library/Binary/CommonSerialization.h
 +++ b/src/Library/Binary/CommonSerialization.h
 @@ -1,6 +1,7 @@
@@ -49,7 +49,7 @@ index b2963601..481885e0 100644
  #include <array>
  #include <typeinfo>
 diff --git a/src/Media/FFmpegBlobIoContext.cpp b/src/Media/FFmpegBlobIoContext.cpp
-index 36b37828..d2b6fbd4 100644
+index 36b3782..d2b6fbd 100644
 --- a/src/Media/FFmpegBlobIoContext.cpp
 +++ b/src/Media/FFmpegBlobIoContext.cpp
 @@ -64,8 +64,11 @@ void FFmpegBlobIoContext::reset(Blob blob) {
@@ -67,7 +67,7 @@ index 36b37828..d2b6fbd4 100644
  
  void FFmpegBlobIoContext::destroyAvioContext() {
 diff --git a/src/Media/FFmpegBlobIoContext.h b/src/Media/FFmpegBlobIoContext.h
-index 28d12876..8ac84cae 100644
+index 28d1287..8ac84ca 100644
 --- a/src/Media/FFmpegBlobIoContext.h
 +++ b/src/Media/FFmpegBlobIoContext.h
 @@ -1,5 +1,6 @@
@@ -78,7 +78,7 @@ index 28d12876..8ac84cae 100644
  #include "Utility/Streams/BlobInputStream.h"
  
 diff --git a/thirdparty/imgui/CMakeLists.txt b/thirdparty/imgui/CMakeLists.txt
-index 945cc45b..7fbb21a8 100644
+index 945cc45..7fbb21a 100644
 --- a/thirdparty/imgui/CMakeLists.txt
 +++ b/thirdparty/imgui/CMakeLists.txt
 @@ -44,5 +44,10 @@ set(IMGUI_HEADERS

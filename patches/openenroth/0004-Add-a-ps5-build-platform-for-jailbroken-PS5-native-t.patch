@@ -20,7 +20,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  7 files changed, 47 insertions(+), 13 deletions(-)
 
 diff --git a/CMakeModules/Dependencies.cmake b/CMakeModules/Dependencies.cmake
-index 1b63cde8..7f96c744 100644
+index 1b63cde..7f96c74 100644
 --- a/CMakeModules/Dependencies.cmake
 +++ b/CMakeModules/Dependencies.cmake
 @@ -113,6 +113,11 @@ macro(resolve_dependencies) # Intentionally a macro - we want set() to work in p
@@ -49,7 +49,7 @@ index 1b63cde8..7f96c744 100644
          find_package(OpenGL REQUIRED)
      endif()
 diff --git a/CMakeModules/Detection.cmake b/CMakeModules/Detection.cmake
-index c0165439..3e01e4c6 100644
+index c016543..3e01e4c 100644
 --- a/CMakeModules/Detection.cmake
 +++ b/CMakeModules/Detection.cmake
 @@ -1,7 +1,10 @@
@@ -65,7 +65,7 @@ index c0165439..3e01e4c6 100644
  elseif(MINGW)
      set(OE_BUILD_PLATFORM "mingw")
 diff --git a/src/Library/StackTrace/CMakeLists.txt b/src/Library/StackTrace/CMakeLists.txt
-index 566a8233..dc403443 100644
+index 566a823..dc40344 100644
 --- a/src/Library/StackTrace/CMakeLists.txt
 +++ b/src/Library/StackTrace/CMakeLists.txt
 @@ -12,7 +12,9 @@ add_library(library_stack_trace STATIC ${LIBRARY_STACK_TRACE_SOURCES} ${LIBRARY_
@@ -81,7 +81,7 @@ index 566a8233..dc403443 100644
      target_link_libraries(library_stack_trace PRIVATE Backward::Backward)
  endif ()
 diff --git a/src/Library/StackTrace/StackTrace.cpp b/src/Library/StackTrace/StackTrace.cpp
-index cf4cded4..31835786 100644
+index cf4cded..3183578 100644
 --- a/src/Library/StackTrace/StackTrace.cpp
 +++ b/src/Library/StackTrace/StackTrace.cpp
 @@ -2,16 +2,16 @@
@@ -105,7 +105,7 @@ index cf4cded4..31835786 100644
  
  #else
 diff --git a/src/Library/StackTrace/StackTraceOnCrash.cpp b/src/Library/StackTrace/StackTraceOnCrash.cpp
-index 95865ded..8de78651 100644
+index 95865de..8de7865 100644
 --- a/src/Library/StackTrace/StackTraceOnCrash.cpp
 +++ b/src/Library/StackTrace/StackTraceOnCrash.cpp
 @@ -2,11 +2,11 @@
@@ -123,7 +123,7 @@ index 95865ded..8de78651 100644
  StackTraceOnCrash::StackTraceOnCrash() = default;
  
 diff --git a/thirdparty/CMakeLists.txt b/thirdparty/CMakeLists.txt
-index b3e5630d..20639c8f 100644
+index b3e5630..20639c8 100644
 --- a/thirdparty/CMakeLists.txt
 +++ b/thirdparty/CMakeLists.txt
 @@ -29,10 +29,20 @@ add_subdirectory(glad EXCLUDE_FROM_ALL)
@@ -161,7 +161,7 @@ index b3e5630d..20639c8f 100644
      if (OE_BUILD_PLATFORM STREQUAL "linux" AND NOT OE_USE_DUMMY_DEPENDENCIES)
          string(FIND "${BACKWARD_DEFINITIONS}" "BACKWARD_HAS_DWARF=1" DWARF_POS)
 diff --git a/thirdparty/imgui/CMakeLists.txt b/thirdparty/imgui/CMakeLists.txt
-index 9e4fd2dd..789ddf35 100644
+index 9e4fd2d..789ddf3 100644
 --- a/thirdparty/imgui/CMakeLists.txt
 +++ b/thirdparty/imgui/CMakeLists.txt
 @@ -37,6 +37,14 @@ add_library(imgui_backends STATIC ${IMGUI_BACKENDS_SOURCES} ${IMGUI_BACKENDS_HEA

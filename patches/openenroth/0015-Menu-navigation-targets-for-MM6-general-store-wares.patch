@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 17:26:44 -0400
+Subject: [PATCH] Menu navigation targets for MM6 general store wares
+
+MM6's general stores draw their six items on their own table layout (mm6GeneralStoreItemPos), which the shop
+targets from the menu navigation patch didn't cover.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_015VfmWXQvA5SFBqR9wsdzx9
+---
+ src/GUI/UI/Houses/Shops.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/GUI/UI/Houses/Shops.cpp b/src/GUI/UI/Houses/Shops.cpp
+index 6bc73fe..de1adf6 100644
+--- a/src/GUI/UI/Houses/Shops.cpp
++++ b/src/GUI/UI/Houses/Shops.cpp
+@@ -610,9 +610,12 @@ void GUIWindow_MagicAlchemyShop::shopWaresDialogue(bool isSpecial) {
+     if (engine->gameVersion() == GAME_VERSION_MM6 && buildingType() == HOUSE_TYPE_ALCHEMY_SHOP) {
+         const std::array<Item, 12> &stock = isSpecial ? pParty->specialItemsInShops[houseId()] : pParty->standartItemsInShops[houseId()];
+ 
+-        for (int i = 0; i < 6; ++i)
+-            if (stock[i].itemId != ITEM_NULL)
++        for (int i = 0; i < 6; ++i) {
++            if (stock[i].itemId != ITEM_NULL) {
+                 render->DrawQuad2D(shop_ui_items_in_store[i], mm6GeneralStoreItemPos(i));
++                addScreenClickTarget(Recti(mm6GeneralStoreItemPos(i), shop_ui_items_in_store[i]->size()));
++            }
++        }
+ 
+         if (!checkIfPlayerCanInteract())
+             return;

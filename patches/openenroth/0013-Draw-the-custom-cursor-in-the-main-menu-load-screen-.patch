@@ -19,7 +19,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  3 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/Application/Game.cpp b/src/Application/Game.cpp
-index 93afcdc0..7661236d 100644
+index 93afcdc..7661236 100644
 --- a/src/Application/Game.cpp
 +++ b/src/Application/Game.cpp
 @@ -150,6 +150,11 @@ int Game::run() {
@@ -35,7 +35,7 @@ index 93afcdc0..7661236d 100644
                  engine->drawOverlay();
                  render->swapBuffers();
 diff --git a/src/GUI/UI/UIPartyCreation.cpp b/src/GUI/UI/UIPartyCreation.cpp
-index b01300eb..23625fe8 100644
+index b01300e..23625fe 100644
 --- a/src/GUI/UI/UIPartyCreation.cpp
 +++ b/src/GUI/UI/UIPartyCreation.cpp
 @@ -1141,6 +1141,9 @@ bool PartyCreationUI_LoopInternal() {
@@ -49,7 +49,7 @@ index b01300eb..23625fe8 100644
          if (uGameState ==
              GAME_FINISHED) {  // if click Esc in PlayerCreation Window
 diff --git a/src/Io/Mouse.cpp b/src/Io/Mouse.cpp
-index 41f5bfe6..c7486557 100644
+index 41f5bfe..c748655 100644
 --- a/src/Io/Mouse.cpp
 +++ b/src/Io/Mouse.cpp
 @@ -131,7 +131,7 @@ void Io::Mouse::DrawCursor() {

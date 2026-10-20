@@ -55,7 +55,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  create mode 100644 src/Library/Platform/Sdl2/SdlWindow.h
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 177f6b3a..805b8829 100644
+index 177f6b3..805b882 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -38,6 +38,7 @@ set(OE_USE_LD_MOLD ON CACHE BOOL "Use mold linker if available.")
@@ -78,7 +78,7 @@ index 177f6b3a..805b8829 100644
  if(OE_USE_CCACHE)
      find_program(CCACHE_FOUND ccache)
 diff --git a/CMakeModules/Dependencies.cmake b/CMakeModules/Dependencies.cmake
-index e8f47806..1b63cde8 100644
+index e8f4780..1b63cde 100644
 --- a/CMakeModules/Dependencies.cmake
 +++ b/CMakeModules/Dependencies.cmake
 @@ -117,13 +117,27 @@ macro(resolve_dependencies) # Intentionally a macro - we want set() to work in p
@@ -128,7 +128,7 @@ index e8f47806..1b63cde8 100644
      print_library_found_message(OpenGL OpenGL::GL "")
  endmacro()
 diff --git a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
-index cfd55203..f1aacfa1 100644
+index cfd5520..f1aacfa 100644
 --- a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 +++ b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 @@ -15,7 +15,11 @@
@@ -180,7 +180,7 @@ index cfd55203..f1aacfa1 100644
  }
  
 diff --git a/src/GUI/Overlay/OverlayEventHandler.cpp b/src/GUI/Overlay/OverlayEventHandler.cpp
-index dbf49b81..3575b2aa 100644
+index dbf49b8..3575b2a 100644
 --- a/src/GUI/Overlay/OverlayEventHandler.cpp
 +++ b/src/GUI/Overlay/OverlayEventHandler.cpp
 @@ -1,6 +1,10 @@
@@ -206,7 +206,7 @@ index dbf49b81..3575b2aa 100644
      return false;
  }
 diff --git a/src/Library/Platform/CMakeLists.txt b/src/Library/Platform/CMakeLists.txt
-index 759101e0..fae50edd 100644
+index 759101e..fae50ed 100644
 --- a/src/Library/Platform/CMakeLists.txt
 +++ b/src/Library/Platform/CMakeLists.txt
 @@ -5,4 +5,11 @@ add_subdirectory(Filters)
@@ -224,7 +224,7 @@ index 759101e0..fae50edd 100644
 +endif()
 diff --git a/src/Library/Platform/Sdl2/CMakeLists.txt b/src/Library/Platform/Sdl2/CMakeLists.txt
 new file mode 100644
-index 00000000..8f1adf8d
+index 0000000..8f1adf8
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/CMakeLists.txt
 @@ -0,0 +1,44 @@
@@ -274,7 +274,7 @@ index 00000000..8f1adf8d
 +target_link_libraries(library_platform_implementation INTERFACE library_platform_sdl)
 diff --git a/src/Library/Platform/Sdl2/SdlEnumTranslation.cpp b/src/Library/Platform/Sdl2/SdlEnumTranslation.cpp
 new file mode 100644
-index 00000000..4787c580
+index 0000000..4787c58
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlEnumTranslation.cpp
 @@ -0,0 +1,245 @@
@@ -525,7 +525,7 @@ index 00000000..4787c580
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlEnumTranslation.h b/src/Library/Platform/Sdl2/SdlEnumTranslation.h
 new file mode 100644
-index 00000000..bf19ece8
+index 0000000..bf19ece
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlEnumTranslation.h
 @@ -0,0 +1,19 @@
@@ -550,7 +550,7 @@ index 00000000..bf19ece8
 +LogLevel translateSdlLogLevel(SDL_LogPriority logLevel);
 diff --git a/src/Library/Platform/Sdl2/SdlEventLoop.cpp b/src/Library/Platform/Sdl2/SdlEventLoop.cpp
 new file mode 100644
-index 00000000..1b2874f4
+index 0000000..1b2874f
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlEventLoop.cpp
 @@ -0,0 +1,366 @@
@@ -922,7 +922,7 @@ index 00000000..1b2874f4
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlEventLoop.h b/src/Library/Platform/Sdl2/SdlEventLoop.h
 new file mode 100644
-index 00000000..96b7d63b
+index 0000000..96b7d63
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlEventLoop.h
 @@ -0,0 +1,43 @@
@@ -971,7 +971,7 @@ index 00000000..96b7d63b
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlGamepad.cpp b/src/Library/Platform/Sdl2/SdlGamepad.cpp
 new file mode 100644
-index 00000000..48f16b38
+index 0000000..48f16b3
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlGamepad.cpp
 @@ -0,0 +1,30 @@
@@ -1007,7 +1007,7 @@ index 00000000..48f16b38
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlGamepad.h b/src/Library/Platform/Sdl2/SdlGamepad.h
 new file mode 100644
-index 00000000..c626f4f5
+index 0000000..c626f4f
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlGamepad.h
 @@ -0,0 +1,27 @@
@@ -1040,7 +1040,7 @@ index 00000000..c626f4f5
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlLogSource.cpp b/src/Library/Platform/Sdl2/SdlLogSource.cpp
 new file mode 100644
-index 00000000..a05e51dd
+index 0000000..a05e51d
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlLogSource.cpp
 @@ -0,0 +1,26 @@
@@ -1072,7 +1072,7 @@ index 00000000..a05e51dd
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlLogSource.h b/src/Library/Platform/Sdl2/SdlLogSource.h
 new file mode 100644
-index 00000000..2388fe42
+index 0000000..2388fe4
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlLogSource.h
 @@ -0,0 +1,9 @@
@@ -1087,7 +1087,7 @@ index 00000000..2388fe42
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlMain.cpp b/src/Library/Platform/Sdl2/SdlMain.cpp
 new file mode 100644
-index 00000000..263f196b
+index 0000000..263f196
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlMain.cpp
 @@ -0,0 +1,11 @@
@@ -1104,7 +1104,7 @@ index 00000000..263f196b
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlOpenGLContext.cpp b/src/Library/Platform/Sdl2/SdlOpenGLContext.cpp
 new file mode 100644
-index 00000000..9024d375
+index 0000000..9024d37
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlOpenGLContext.cpp
 @@ -0,0 +1,47 @@
@@ -1157,7 +1157,7 @@ index 00000000..9024d375
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlOpenGLContext.h b/src/Library/Platform/Sdl2/SdlOpenGLContext.h
 new file mode 100644
-index 00000000..06466aa3
+index 0000000..06466aa
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlOpenGLContext.h
 @@ -0,0 +1,24 @@
@@ -1187,7 +1187,7 @@ index 00000000..06466aa3
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlPlatform.cpp b/src/Library/Platform/Sdl2/SdlPlatform.cpp
 new file mode 100644
-index 00000000..0fbe2c41
+index 0000000..0fbe2c4
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlPlatform.cpp
 @@ -0,0 +1,165 @@
@@ -1358,7 +1358,7 @@ index 00000000..0fbe2c41
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlPlatform.h b/src/Library/Platform/Sdl2/SdlPlatform.h
 new file mode 100644
-index 00000000..da6bdcce
+index 0000000..da6bdcc
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlPlatform.h
 @@ -0,0 +1,35 @@
@@ -1399,7 +1399,7 @@ index 00000000..da6bdcce
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlPlatformSharedState.cpp b/src/Library/Platform/Sdl2/SdlPlatformSharedState.cpp
 new file mode 100644
-index 00000000..068da473
+index 0000000..068da47
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlPlatformSharedState.cpp
 @@ -0,0 +1,129 @@
@@ -1534,7 +1534,7 @@ index 00000000..068da473
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlPlatformSharedState.h b/src/Library/Platform/Sdl2/SdlPlatformSharedState.h
 new file mode 100644
-index 00000000..ac218cb1
+index 0000000..ac218cb
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlPlatformSharedState.h
 @@ -0,0 +1,52 @@
@@ -1592,7 +1592,7 @@ index 00000000..ac218cb1
 +};
 diff --git a/src/Library/Platform/Sdl2/SdlWindow.cpp b/src/Library/Platform/Sdl2/SdlWindow.cpp
 new file mode 100644
-index 00000000..f3319ef5
+index 0000000..f3319ef
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlWindow.cpp
 @@ -0,0 +1,225 @@
@@ -1823,7 +1823,7 @@ index 00000000..f3319ef5
 +}
 diff --git a/src/Library/Platform/Sdl2/SdlWindow.h b/src/Library/Platform/Sdl2/SdlWindow.h
 new file mode 100644
-index 00000000..a9c2ae75
+index 0000000..a9c2ae7
 --- /dev/null
 +++ b/src/Library/Platform/Sdl2/SdlWindow.h
 @@ -0,0 +1,65 @@
@@ -1893,7 +1893,7 @@ index 00000000..a9c2ae75
 +    uint32_t _id = 0; // SDL window id, see SDL_GetWindowID.
 +};
 diff --git a/thirdparty/imgui/CMakeLists.txt b/thirdparty/imgui/CMakeLists.txt
-index 7fbb21a8..9e4fd2dd 100644
+index 7fbb21a..9e4fd2d 100644
 --- a/thirdparty/imgui/CMakeLists.txt
 +++ b/thirdparty/imgui/CMakeLists.txt
 @@ -12,19 +12,29 @@ endfunction()

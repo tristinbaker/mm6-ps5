@@ -16,7 +16,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  3 files changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 26d30f4a..177f6b3a 100644
+index 26d30f4..177f6b3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -37,6 +37,7 @@ set(OE_USE_SCCACHE ON CACHE BOOL "Use sccache if available, note that ccache tak
@@ -39,7 +39,7 @@ index 26d30f4a..177f6b3a 100644
  if(OE_USE_CCACHE)
      find_program(CCACHE_FOUND ccache)
 diff --git a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
-index 96d2ed39..cfd55203 100644
+index 96d2ed3..cfd5520 100644
 --- a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 +++ b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 @@ -81,6 +81,15 @@ static GLuint framebuffer = 0;
@@ -111,7 +111,7 @@ index 96d2ed39..cfd55203 100644
      glEnable(GL_DEPTH_TEST);
      glDepthFunc(GL_LEQUAL);
 diff --git a/src/Engine/Graphics/Renderer/OpenGLShader.cpp b/src/Engine/Graphics/Renderer/OpenGLShader.cpp
-index 097eed09..939ea3ba 100644
+index 097eed0..939ea3b 100644
 --- a/src/Engine/Graphics/Renderer/OpenGLShader.cpp
 +++ b/src/Engine/Graphics/Renderer/OpenGLShader.cpp
 @@ -99,7 +99,11 @@ unsigned OpenGLShader::loadShader(const Blob &source, int type, bool openGLES, c

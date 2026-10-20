@@ -17,7 +17,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  4 files changed, 19 insertions(+), 7 deletions(-)
 
 diff --git a/src/Application/GameConfig.h b/src/Application/GameConfig.h
-index fef0f8a1..87532084 100644
+index fef0f8a..8753208 100644
 --- a/src/Application/GameConfig.h
 +++ b/src/Application/GameConfig.h
 @@ -623,7 +623,9 @@ class GameConfig : public Config {
@@ -41,7 +41,7 @@ index fef0f8a1..87532084 100644
          static int ValidateTurnSpeed(int speed) {
              return std::clamp(speed, 0, 1024);
 diff --git a/src/Engine/Graphics/Indoor.cpp b/src/Engine/Graphics/Indoor.cpp
-index cb7686a7..5be25590 100644
+index cb7686a..5be2559 100644
 --- a/src/Engine/Graphics/Indoor.cpp
 +++ b/src/Engine/Graphics/Indoor.cpp
 @@ -1558,6 +1558,9 @@ void BLV_ProcessPartyActions() {  // could this be combined with odm process act
@@ -73,7 +73,7 @@ index cb7686a7..5be25590 100644
                      pParty->_viewPitch = -128;
                  if (pParty->hasActiveCharacter())
 diff --git a/src/Engine/Graphics/Outdoor.cpp b/src/Engine/Graphics/Outdoor.cpp
-index f1ba5502..ea06556a 100644
+index f1ba550..ea06556 100644
 --- a/src/Engine/Graphics/Outdoor.cpp
 +++ b/src/Engine/Graphics/Outdoor.cpp
 @@ -1092,6 +1092,9 @@ void ODM_ProcessPartyActions() {
@@ -105,7 +105,7 @@ index f1ba5502..ea06556a 100644
                  if (pParty->hasActiveCharacter()) {
                      pParty->activeCharacter().playReaction(SPEECH_LOOK_DOWN);
 diff --git a/src/Io/KeyboardInputHandler.cpp b/src/Io/KeyboardInputHandler.cpp
-index a6366165..938c44ce 100644
+index a636616..938c44c 100644
 --- a/src/Io/KeyboardInputHandler.cpp
 +++ b/src/Io/KeyboardInputHandler.cpp
 @@ -63,8 +63,12 @@ void Io::KeyboardInputHandler::GenerateActions(bool isPaused) {

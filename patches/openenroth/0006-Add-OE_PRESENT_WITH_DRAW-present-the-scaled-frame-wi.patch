@@ -21,7 +21,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
  create mode 100644 resources/shaders/glpresent.vert
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 805b8829..797d9393 100644
+index 805b882..797d939 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -39,6 +39,7 @@ set(OE_USE_LD_LLD ON CACHE BOOL "Use lld linker if available, note that mold tak
@@ -45,7 +45,7 @@ index 805b8829..797d9393 100644
  endif()
 diff --git a/resources/shaders/glpresent.frag b/resources/shaders/glpresent.frag
 new file mode 100644
-index 00000000..6094bc70
+index 0000000..6094bc7
 --- /dev/null
 +++ b/resources/shaders/glpresent.frag
 @@ -0,0 +1,11 @@
@@ -62,7 +62,7 @@ index 00000000..6094bc70
 +}
 diff --git a/resources/shaders/glpresent.vert b/resources/shaders/glpresent.vert
 new file mode 100644
-index 00000000..3b405871
+index 0000000..3b40587
 --- /dev/null
 +++ b/resources/shaders/glpresent.vert
 @@ -0,0 +1,9 @@
@@ -76,7 +76,7 @@ index 00000000..3b405871
 +    gl_Position = vec4(position, 0.0, 1.0);
 +}
 diff --git a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
-index f1aacfa1..29d68b84 100644
+index f1aacfa..29d68b8 100644
 --- a/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 +++ b/src/Engine/Graphics/Renderer/OpenGLRenderer.cpp
 @@ -2250,12 +2250,54 @@ void OpenGLRenderer::flushAndScale() {
@@ -145,7 +145,7 @@ index f1aacfa1..29d68b84 100644
  
      SubFileSystem shadersFs("shaders", dfs);
 diff --git a/src/Engine/Graphics/Renderer/OpenGLRenderer.h b/src/Engine/Graphics/Renderer/OpenGLRenderer.h
-index f29cef22..00f1f743 100644
+index f29cef2..00f1f74 100644
 --- a/src/Engine/Graphics/Renderer/OpenGLRenderer.h
 +++ b/src/Engine/Graphics/Renderer/OpenGLRenderer.h
 @@ -111,6 +111,7 @@ class OpenGLRenderer : public BaseRenderer {
