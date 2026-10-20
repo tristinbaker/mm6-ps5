@@ -77,8 +77,8 @@ clears and Cross finishes.
 To **set the quick spell**, open the spellbook (L1), move to a spell, press Cross to select it, and press R1. R1 then
 casts it in the game. Pressing Cross again on the selected spell casts it straight away.
 
-To **save**, open the game menu (Circle), choose Save, click an empty slot, then click Save. The name starts as your
-location; click Save again to keep it.
+To **save**, open the game menu (Circle), choose Save, click a slot, then click Save. A save you don't name is
+named after your location.
 
 Known problems: the sticks work like keys (walk or don't, move at one speed) rather than analog.
 
