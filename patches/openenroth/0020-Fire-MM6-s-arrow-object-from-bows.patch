@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 20:52:13 -0400
+Subject: [PATCH] Fire MM6's arrow object from bows
+
+Every bow shot in MM6 missed. The hit roll was fine, but SPELL_BOW_ARROW maps to MM7's arrow object 545, which
+MM6's dobjlist doesn't have, so the arrow was never created and the shot vanished on the spot. MM6's own arrow is
+object 500, the one its archer monsters already fire, so the party's arrows use it too, the same way the blaster
+already swaps in MM6's laser bolt. Mm6.BowArrowsHit shoots a peasant dead with a longbow.
+---
+ src/Engine/Spells/CastSpellInfo.cpp |  4 +++
+ test/Bin/GameTest/GameTests_Mm6.cpp | 39 +++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+
+diff --git a/src/Engine/Spells/CastSpellInfo.cpp b/src/Engine/Spells/CastSpellInfo.cpp
+index 7895b38..3d2407c 100644
+--- a/src/Engine/Spells/CastSpellInfo.cpp
++++ b/src/Engine/Spells/CastSpellInfo.cpp
+@@ -470,6 +470,10 @@ void CastSpellInfoHelpers::castSpell() {
+         // shot despawns on the spot.
+         if (engine->gameVersion() == GAME_VERSION_MM6 && pCastSpell->uSpellID == SPELL_LASER_PROJECTILE)
+             pSpellSprite.spriteId = SPRITE_MM6_PROJECTILE_LASER;
++        // Same for the party's arrows: MM6's arrow is object 500, MM7's 545 isn't in its dobjlist. On impact 500
++        // takes the bolt path, like MM6 monsters' arrows.
++        if (engine->gameVersion() == GAME_VERSION_MM6 && pCastSpell->uSpellID == SPELL_BOW_ARROW)
++            pSpellSprite.spriteId = SPRITE_MM6_PROJECTILE_ARROW;
+ 
+         if (pSpellSprite.spriteId != SPRITE_NULL) {
+             if (spell_targeted_at.type() == OBJECT_Actor) {
+diff --git a/test/Bin/GameTest/GameTests_Mm6.cpp b/test/Bin/GameTest/GameTests_Mm6.cpp
+index 990fbe3..96e49a6 100644
+--- a/test/Bin/GameTest/GameTests_Mm6.cpp
++++ b/test/Bin/GameTest/GameTests_Mm6.cpp
+@@ -10367,3 +10367,42 @@ GAME_TEST(Mm6, MonsterPopupMm6Layout) {
+     game.releaseButton(BUTTON_RIGHT, pickX, pickY);
+     game.tick(2);
+ }
++
++GAME_TEST(Mm6, BowArrowsHit) {
++    if (engine->gameVersion() != GAME_VERSION_MM6)
++        GTEST_SKIP() << "MM6 game data required, run with --game-version mm6.";
++
++    game.startNewGame();
++
++    // Bow shots never hit anything, the arrows vanished the moment they were fired.
++    auto peasant = std::ranges::find_if(pActors, [](const Actor &actor) {
++        return std::to_underlying(actor.monsterId) == 123 && actor.initialPosition == Vec3f(-10296, -7528, 160);
++    });
++    ASSERT_NE(peasant, pActors.end());
++    int peasantId = peasant->id;
++    ASSERT_EQ(pItemTable->items[ItemId(42)].type, ITEM_TYPE_BOW); // Longbow.
++    for (Character &character : pParty->pCharacters)
++        if (!character.inventory.entry(ITEM_SLOT_BOW))
++            character.inventory.equip(ITEM_SLOT_BOW, Item(ItemId(42)));
++
++    // Shoot from out of melee range until the peasant dies, roughly half the arrows hit.
++    int arrowsSeen = 0;
++    for (int shot = 0; shot < 30 && pActors[peasantId].aiState != Dead; shot++) {
++        Vec3f target = pActors[peasantId].pos;
++        Vec3f pos = target + Vec3f(-800, 0, 0);
++        game.teleportTo(engine->_currentLoadedMapId, pos, TrigLUT.atan2(target.x - pos.x, target.y - pos.y) * 90 / 512);
++        game.tick(1);
++        game.pressAndReleaseKey(PlatformKey::KEY_A);
++        bool arrow = false;
++        for (int i = 0; i < 40; i++) {
++            game.tick(1);
++            arrow |= std::ranges::any_of(pSpriteObjects, [](const SpriteObject &object) {
++                return object.uSpellID == SPELL_BOW_ARROW && object.uObjectDescID != 0;
++            });
++        }
++        arrowsSeen += arrow;
++        game.tick(60); // Recovery.
++    }
++    EXPECT_GT(arrowsSeen, 0);
++    EXPECT_EQ(pActors[peasantId].aiState, Dead);
++}
