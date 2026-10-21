@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tristin Baker <tristinbaker@protonmail.com>
+Date: Tue, 20 Oct 2026 20:00:55 -0400
+Subject: [PATCH] Use MM6's Magic Horseshoe
+
+useItem only knew MM7's horseshoe, item 646. MM6 numbers its items differently and its Magic Horseshoe is 463, so
+right-clicking it onto a portrait said it can't be used that way instead of giving 2 skill points. Covered by the
+new Mm6.MagicHorseshoe game test.
+---
+ src/Engine/Objects/Character.cpp    |  4 +++-
+ test/Bin/GameTest/GameTests_Mm6.cpp | 19 +++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/Engine/Objects/Character.cpp b/src/Engine/Objects/Character.cpp
+index 7e280ae..ff02ef0 100644
+--- a/src/Engine/Objects/Character.cpp
++++ b/src/Engine/Objects/Character.cpp
+@@ -4053,7 +4053,9 @@ void Character::useItem(int targetCharacter, bool isPortraitClick) {
+         } else if (pParty->pPickedItem.itemId == ITEM_QUEST_GRYPHONHEARTS_TRUMPET) {
+             pAudioPlayer->playUISound(SOUND_trumpet);
+             return;
+-        } else if (pParty->pPickedItem.itemId == ITEM_HORSESHOE) {
++        } else if (pParty->pPickedItem.itemId == (engine->gameVersion() == GAME_VERSION_MM6 ? ItemId(463) : ITEM_HORSESHOE)) {
++            // MM6 numbers its items differently: its Magic Horseshoe is 463 (items.txt). MM7's other items above
++            // are all past MM6's last item, so they never match one.
+             spell_fx_renderer->SetPlayerBuffAnim(SPELL_QUEST_COMPLETED, targetCharacter);
+             //v5 = Pid(OBJECT_Character, player_num + 49);
+             //pAudioPlayer->playSound(SOUND_quest, v5);
+diff --git a/test/Bin/GameTest/GameTests_Mm6.cpp b/test/Bin/GameTest/GameTests_Mm6.cpp
+index 21eab6c..990fbe3 100644
+--- a/test/Bin/GameTest/GameTests_Mm6.cpp
++++ b/test/Bin/GameTest/GameTests_Mm6.cpp
+@@ -2266,6 +2266,25 @@ GAME_TEST(Mm6, ArtifactIdsAndTreasureRoll) {
+     EXPECT_GT(artifactsRolled, 0); // ~5% of 400 rolls, capped by the artifact limit.
+ }
+ 
++GAME_TEST(Mm6, MagicHorseshoe) {
++    if (engine->gameVersion() != GAME_VERSION_MM6)
++        GTEST_SKIP() << "MM6 game data required, run with --game-version mm6.";
++
++    game.startNewGame();
++    game.tick(1);
++
++    // MM6's Magic Horseshoe is item 463 (MM7's is 646). Right-clicked onto a portrait it gives that character
++    // 2 skill points and is used up.
++    ASSERT_EQ(pItemTable->items[ItemId(463)].name, "Magic Horseshoe");
++    Character &target = pParty->pCharacters[1];
++    int skillPoints = target.uSkillPoints;
++    pParty->setHoldingItem(Item(ItemId(463)));
++    pParty->pCharacters[0].useItem(1, true);
++    game.tick(1);
++    EXPECT_EQ(target.uSkillPoints, skillPoints + 2);
++    EXPECT_EQ(pParty->pPickedItem.itemId, ITEM_NULL);
++}
++
+ GAME_TEST(Mm6, DrinkPotions) {
+     if (engine->gameVersion() != GAME_VERSION_MM6)
+         GTEST_SKIP() << "MM6 game data required, run with --game-version mm6.";
